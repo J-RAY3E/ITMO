@@ -1,0 +1,60 @@
+# =============================================================================
+# WILDFLY CLI SCRIPT - Deshabilitar Subsistemas No Necesarios
+# =============================================================================
+# Ejecutar con:
+# /home/studs/s466103/wildfly-26.1.3.Final/bin/jboss-cli.sh --connect --file=disable-subsystems.cli
+#
+# O ejecutar manualmente en modo interactivo:
+# /home/studs/s466103/wildfly-26.1.3.Final/bin/jboss-cli.sh --connect
+# =============================================================================
+
+# Conectar al servidor (si se ejecuta como script)
+# connect
+
+# -----------------------------------------------------------------------------
+# SUBSISTEMAS SEGUROS PARA DESHABILITAR (para una app JSF + JPA básica)
+# -----------------------------------------------------------------------------
+
+# MicroProfile - No necesario para JSF tradicional
+/subsystem=microprofile-config-smallrye:remove()
+/subsystem=microprofile-jwt-smallrye:remove()
+/subsystem=microprofile-health-smallrye:remove()
+/subsystem=microprofile-metrics-smallrye:remove()
+/subsystem=microprofile-opentracing-smallrye:remove()
+/subsystem=microprofile-fault-tolerance-smallrye:remove()
+
+# SOAP Web Services - Si no usas JAX-WS
+/subsystem=webservices:remove()
+
+# CORBA/IIOP - Raramente usado
+/subsystem=iiop-openjdk:remove()
+
+# Batch Processing - Si no usas JSR-352
+/subsystem=batch-jberet:remove()
+
+# Bean Validation - Opcional, descomenta si no validas beans
+# /subsystem=bean-validation:remove()
+
+# Mail - Si no envías correos
+/subsystem=mail:remove()
+
+# Resource Adapters - Si no usas JCA
+/subsystem=resource-adapters:remove()
+
+# JAX-RS (REST) - Descomenta SOLO si no usas REST en absoluto
+# /subsystem=jaxrs:remove()
+
+# EJB - Descomenta SOLO si no usas EJBs (CDI es suficiente para la mayoría)
+# /subsystem=ejb3:remove()
+
+# Messaging - Si no usas JMS/ActiveMQ
+/subsystem=messaging-activemq:remove()
+
+# -----------------------------------------------------------------------------
+# RECARGAR CONFIGURACIÓN
+# -----------------------------------------------------------------------------
+:reload
+
+# Mostrar subsistemas restantes
+echo "Subsistemas restantes después de la limpieza:"
+/subsystem=*:read-resource()

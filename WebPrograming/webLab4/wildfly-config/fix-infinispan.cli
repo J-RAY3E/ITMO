@@ -1,0 +1,23 @@
+# =============================================================================
+# SCRIPT CLI PARA REMOVER INFINISPAN DE WILDFLY
+# =============================================================================
+# El subsistema Infinispan está corrupto/roto en tu instalación.
+# Este script lo remueve completamente.
+#
+# EJECUTAR CON:
+# /home/studs/s466103/wildfly-26.1.3.Final/bin/jboss-cli.sh --connect --file=fix-infinispan.cli
+#
+# O EJECUTAR MANUALMENTE:
+# /home/studs/s466103/wildfly-26.1.3.Final/bin/jboss-cli.sh --connect
+# Luego copia y pega cada comando uno por uno
+# =============================================================================
+
+# Remover los cache-containers problemáticos
+/subsystem=infinispan/cache-container=hibernate:remove()
+/subsystem=infinispan/cache-container=ejb:remove()
+
+# Si los anteriores fallan, intenta remover todo el subsistema infinispan
+# /subsystem=infinispan:remove()
+
+# Recargar la configuración
+:reload

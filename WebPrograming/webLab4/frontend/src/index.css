@@ -1,0 +1,219 @@
+:root {
+  --primary: #6c5ce7;
+  --primary-hover: #5b4cc4;
+  --secondary: #a29bfe;
+  --background: #dfe6e9;
+  --surface: #ffffff;
+  --text: #2d3436;
+  --error: #d63031;
+  --success: #00b894;
+  --radius: 8px;
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text);
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Header */
+header {
+  background: var(--primary);
+  color: white;
+  padding: 1rem;
+  border-radius: var(--radius);
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow);
+}
+
+header h1 {
+  font-size: 1.2rem;
+}
+
+.logout-btn {
+  background: transparent;
+  border: 1px solid white;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.logout-btn:hover {
+  background: white;
+  color: var(--primary);
+}
+
+/* Forms */
+.card {
+  background: var(--surface);
+  padding: 2rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+input,
+select,
+button {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: var(--radius);
+  font-size: 1rem;
+}
+
+button.primary {
+  background: var(--primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button.primary:hover {
+  background: var(--primary-hover);
+}
+
+.error-msg {
+  color: var(--error);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+/* Auth Page */
+.auth-container {
+  max-width: 400px;
+  margin: 5rem auto;
+}
+
+/* Main Page Layout */
+.main-grid {
+  display: grid;
+  gap: 2rem;
+}
+
+.graph-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.form-section {
+  /* Form styles are in card */
+}
+
+.table-section {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+th,
+td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+th {
+  background: var(--secondary);
+  color: white;
+}
+
+/* Responsive Modes */
+
+/* Desktop (>= 1249px) */
+@media (min-width: 1249px) {
+  .main-grid {
+    grid-template-columns: 1fr 1fr;
+    /* Graph | Form */
+    grid-template-areas:
+      "graph form"
+      "table table";
+  }
+
+  .graph-section {
+    grid-area: graph;
+  }
+
+  .form-section {
+    grid-area: form;
+  }
+
+  .table-section {
+    grid-area: table;
+  }
+}
+
+/* Tablet (>= 656px and < 1249px) */
+@media (min-width: 656px) and (max-width: 1248px) {
+  .main-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .graph-section,
+  .form-section,
+  .table-section {
+    width: 100%;
+  }
+
+  /* Optional: Make graph and form side-by-side if they fit, or stacked */
+  /* Prompt says "adapted". Usually stacked or adjusted grid. I'll stack graph and form or put check history below. */
+  /* Let's keeps simple stacked for Tablet to differentiate from Desktop */
+
+  /* Actually, maybe 2 columns for form inputs? */
+}
+
+/* Mobile (< 656px) */
+@media (max-width: 655px) {
+  .main-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+}

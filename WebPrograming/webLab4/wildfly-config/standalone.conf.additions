@@ -1,0 +1,63 @@
+#!/bin/bash
+# =============================================================================
+# WILDFLY MEMORY OPTIMIZATION SCRIPT
+# =============================================================================
+# Añade estas líneas al final de tu archivo:
+# /home/studs/s466103/wildfly-26.1.3.Final/bin/standalone.conf
+#
+# O copia todo este contenido y reemplaza el standalone.conf existente
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# METASPACE CONFIGURATION (Soluciona el OutOfMemoryError: Metaspace)
+# -----------------------------------------------------------------------------
+# MaxMetaspaceSize: Límite máximo de Metaspace (512MB debería ser suficiente)
+# MetaspaceSize: Tamaño inicial para evitar expansiones frecuentes
+# -----------------------------------------------------------------------------
+JAVA_OPTS="$JAVA_OPTS -XX:MetaspaceSize=256m"
+JAVA_OPTS="$JAVA_OPTS -XX:MaxMetaspaceSize=512m"
+
+# -----------------------------------------------------------------------------
+# HEAP MEMORY CONFIGURATION
+# -----------------------------------------------------------------------------
+# Xms: Memoria heap inicial
+# Xmx: Memoria heap máxima
+# Ajusta estos valores según la memoria disponible en tu servidor
+# -----------------------------------------------------------------------------
+JAVA_OPTS="$JAVA_OPTS -Xms256m"
+JAVA_OPTS="$JAVA_OPTS -Xmx512m"
+
+# -----------------------------------------------------------------------------
+# GARBAGE COLLECTOR OPTIMIZATION
+# -----------------------------------------------------------------------------
+# Usa G1GC que es más eficiente para aplicaciones con mucha carga de clases
+# -----------------------------------------------------------------------------
+JAVA_OPTS="$JAVA_OPTS -XX:+UseG1GC"
+JAVA_OPTS="$JAVA_OPTS -XX:+UseStringDeduplication"
+
+# -----------------------------------------------------------------------------
+# CLASS UNLOADING (Ayuda a liberar Metaspace)
+# -----------------------------------------------------------------------------
+JAVA_OPTS="$JAVA_OPTS -XX:+ClassUnloading"
+JAVA_OPTS="$JAVA_OPTS -XX:+CMSClassUnloadingEnabled"
+
+# -----------------------------------------------------------------------------
+# OPTIONAL: Reduce el tiempo de startup deshabilitando verificación de bytecode
+# (Solo para desarrollo, no para producción)
+# -----------------------------------------------------------------------------
+# JAVA_OPTS="$JAVA_OPTS -Xverify:none"
+
+# -----------------------------------------------------------------------------
+# DIAGNOSTICS (Descomenta si necesitas diagnosticar problemas de memoria)
+# -----------------------------------------------------------------------------
+# JAVA_OPTS="$JAVA_OPTS -XX:+HeapDumpOnOutOfMemoryError"
+# JAVA_OPTS="$JAVA_OPTS -XX:HeapDumpPath=/tmp/wildfly-heap-dump.hprof"
+# JAVA_OPTS="$JAVA_OPTS -verbose:class"  # Log de clases cargadas
+
+echo "============================================="
+echo "WildFly Memory Optimizations Applied:"
+echo "  - MetaspaceSize: 256m (initial)"
+echo "  - MaxMetaspaceSize: 512m (maximum)"
+echo "  - Heap: 256m - 512m"
+echo "  - GC: G1GC with String Deduplication"
+echo "============================================="
