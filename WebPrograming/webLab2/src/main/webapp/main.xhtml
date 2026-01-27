@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="https://jakarta.ee/xml/ns/jakartaee"
+    xmlns:f="https://jakarta.ee/xml/ns/jakartaee" xmlns:ace="http://www.icefaces.org/icefaces/components">
+<h:head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Point Checker - Main Application</title>
+    <h:outputStylesheet library="css" name="style.css" />
+    <h:outputScript library="js" name="canvas.js" />
+</h:head>
+<h:body>
+    <div class="container">
+        <header class="header">
+            <h1>Проверка попадания точки в область</h1>
+        </header>
+
+        <ace:messages id="messages" showDetail="true" closable="true" />
+
+        <div class="main-content">
+            <!-- Left panel: Input form and canvas -->
+            <div class="left-panel">
+                <!-- Input Form -->
+                <h:form id="pointForm" styleClass="point-form">
+                    <h3>Введите координаты</h3>
+
+                    <div class="form-group">
+                        <h:outputLabel for="xInput" value="X координата:" />
+                        <ace:radioButtons id="xInput" value="#{pointBean.x}" required="true">
+                            <f:selectItem itemLabel="-4" itemValue="-4" />
+                            <f:selectItem itemLabel="-3" itemValue="-3" />
+                            <f:selectItem itemLabel="-2" itemValue="-2" />
+                            <f:selectItem itemLabel="-1" itemValue="-1" />
+                            <f:selectItem itemLabel="0" itemValue="0" />
+                            <f:selectItem itemLabel="1" itemValue="1" />
+                            <f:selectItem itemLabel="2" itemValue="2" />
+                            <f:selectItem itemLabel="3" itemValue="3" />
+                            <f:selectItem itemLabel="4" itemValue="4" />
+                        </ace:radioButtons>
+                    </div>
+
+                    <div class="form-group">
+                        <h:outputLabel for="yInput" value="Y координата (-5 до 3):" />
+                        <ace:textEntry id="yInput" value="#{pointBean.y}" required="true" requiredMessage="Y обязателен"
+                            validatorMessage="Y должен быть от -5 до 3">
+                            <f:validateDoubleRange minimum="-5" maximum="3" />
+                        </ace:textEntry>
+                    </div>
+
+                    <div class="form-group">
+                        <h:outputLabel for="rInput" value="Радиус R:" />
+                        <ace:radioButtons id="rInput" value="#{pointBean.r}" required="true" layout="lineDirection">
+                            <f:selectItem itemLabel="1" itemValue="1" />
+                            <f:selectItem itemLabel="1.5" itemValue="1.5" />
+                            <f:selectItem itemLabel="2" itemValue="2" />
+                            <f:selectItem itemLabel="2.5" itemValue="2.5" />
+                            <f:selectItem itemLabel="3" itemValue="3" />
+                        </ace:radioButtons>
+                    </div>
+
+                    <div class="form-actions">
+                        <ace:pushButton value="Проверить" actionListener="#{resultsBean.checkPoint}"
+                            styleClass="btn btn-primary" />
+                        <ace:pushButton value="Очистить" actionListener="#{pointBean.reset}"
+                            styleClass="btn btn-secondary" />
+                    </div>
+                </h:form>
+
+                <!-- Canvas for visualization -->
+                <div class="canvas-container">
+                    <h3>Визуализация области</h3>
+                    <h:form id="canvasForm">
+                        <canvas id="pointCanvas" width="400" height="400"></canvas>
+                        <h:inputHidden id="canvasXInput" value="#{pointBean.canvasX}" />
+                        <h:inputHidden id="canvasYInput" value="#{pointBean.canvasY}" />
+                        <h:inputHidden id="currentR" value="#{pointBean.r}" />
+                        <ace:ajax execute="@form" render="messages resultsTable pointCanvas" event="canvasClick"
+                            listener="#{resultsBean.checkCanvasPoint}" />
+                    </h:form>
+                </div>
+            </div>
+
+            <!-- Right panel: Results table -->
+            <div class="right-panel">
+                <div class="results-section">
+                    <h3>Результаты проверок</h3>
+                    <h:form id="resultsForm">
+                        <ace:pushButton value="Очистить все результаты" actionListener="#{resultsBean.clearResults}"
+                            styleClass="btn btn-danger" style="margin-bottom: 10px;">
+                            <ace:confirmationDialog message="Вы уверены, что хотите удалить все результаты?"
+                                header="Подтверждение" />
+                        </ace:pushButton>
+
+                        <ace:dataTable id="resultsTable" value="#{resultsBean.results}" var="result" paginator="true"
+                            rows="10" styleClass="results-table">
+                            <ace:column headerText="X">
+                                <h:outputText value="#{result.x}">
+                                    <f:convertNumber pattern="#0.00" />
+                                </h:outputText>
+                            </ace:column>
+
+                            <ace:column headerText="Y">
+                                <h:outputText value="#{result.y}">
+                                    <f:convertNumber pattern="#0.00" />
+                                </h:outputText>
+                            </ace:column>
+
+                            <ace:column headerText="R">
+                                <h:outputText value="#{result.r}">
+                                    <f:convertNumber pattern="#0.00" />
+                                </h:outputText>
+                            </ace:column>
+
+                            <ace:column headerText="Результат">
+                                <h:outputText value="#{result.hit ? 'Попадание' : 'Промах'}"
+                                    styleClass="#{result.hit ? 'hit' : 'miss'}" />
+                            </ace:column>
+
+                            <ace:column headerText="Время проверки">
+                                <h:outputText value="#{result.checkTime}">
+                                    <f:convertDateTime pattern="dd.MM.yyyy HH:mm:ss" />
+                                </h:outputText>
+                            </ace:column>
+
+                            <ace:column headerText="Время выполнения">
+                                <h:outputText value="#{result.executionTime / 1000} мкс" />
+                            </ace:column>
+                        </ace:dataTable>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation back to start -->
+        <div class="navigation">
+            <h:form>
+                <h:commandButton value="← Вернуться на стартовую страницу" action="toStart"
+                    styleClass="btn btn-secondary" />
+            </h:form>
+        </div>
+
+        <footer class="footer">
+            <p>Web Programming, 2024</p>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize canvas
+        window.onload = function () {
+            const r = parseFloat(document.getElementById('canvasForm:currentR').value) || 1;
+            drawCanvas(r);
+            drawPoints();
+        };
+    </script>
+</h:body>
+
+</html>

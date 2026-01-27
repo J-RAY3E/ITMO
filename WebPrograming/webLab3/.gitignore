@@ -1,0 +1,9 @@
+```
+# Compiled and build artifacts
+*.class
+target/
+# Dependencies
+WEB-INF/lib/
+# Archives
+*.war
+```

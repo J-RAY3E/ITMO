@@ -1,0 +1,200 @@
+/* CSS Variables inherited from index.css */
+:root {
+    /* Background Colors */
+    --bg-primary: #121212;
+    --bg-secondary: #1e1e1e;
+    --bg-surface-medium: #313131;
+    --bg-button-dark: #333333;
+    --border-dark: #444444;
+    --border-medium: #555555;
+    --shadow-strong: rgba(0, 0, 0, 0.3);
+    --surface-translucent: rgba(30, 30, 30, 0.6);
+
+    /* Text Colors */
+    --text-primary: #e0e0e0;
+    --text-secondary: #aaa;
+    --text-white: #ffffff;
+
+    /* Primary Colors */
+    --primary-purple: #7a5cf0;
+    --primary-purple-hover: #6a4ce0;
+
+    /* Error/Success Colors */
+    --error-red: #ff4757;
+    --success-green: #10b981;
+
+    /* Legacy mappings */
+    --border-color: #555555;
+    --accent-primary: #7a5cf0;
+    --accent-hover: #6a4ce0;
+    --error: #ff4757;
+    --success: #10b981;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --card-bg: rgba(30, 30, 30, 0.6);
+    --table-header: #313131;
+    --table-row: #1e1e1e;
+}
+
+body {
+    font-family: sans-serif;
+    background-color: #121212;
+    color: #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+}
+
+#theme-toggle {
+    padding: 10px 20px;
+    background: var(--primary-purple);
+    color: var(--text-white);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px var(--shadow-strong);
+    z-index: 1000;
+}
+
+#theme-toggle:hover {
+    background: var(--primary-purple-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow-strong);
+}
+
+.container {
+    text-align: center;
+    background: var(--surface-translucent);
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px var(--shadow-strong);
+    border: 1px solid var(--border-medium);
+    backdrop-filter: blur(10px);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.container h2 {
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    font-size: 1.5em;
+}
+
+.graph-container {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.result-table {
+    margin: 20px auto;
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 600px;
+    background: var(--surface-translucent);
+    border: 1px solid var(--border-medium);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.result-table,
+th,
+td {
+    border: 1px solid var(--border-medium);
+}
+
+th,
+td {
+    padding: 12px;
+    text-align: left;
+    color: var(--text-primary);
+}
+
+th {
+    background: var(--bg-surface-medium);
+    color: var(--text-primary);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9em;
+    letter-spacing: 0.5px;
+    width: 40%;
+}
+
+td {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    width: 60%;
+}
+
+.result-info {
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 18px;
+}
+
+.hit {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: var(--success-green);
+    border: 2px solid var(--success-green);
+}
+
+.miss {
+    background-color: rgba(255, 71, 87, 0.1);
+    color: var(--error-red);
+    border: 2px solid var(--error-red);
+}
+
+.point-info {
+    margin: 10px 0;
+    font-size: 16px;
+}
+
+.area {
+    fill: rgba(122, 92, 240, 0.2);
+    stroke: var(--primary-purple);
+    stroke-width: 1.5;
+    stroke-dasharray: 5, 5;
+}
+
+.result-point {
+    stroke-width: 2;
+}
+
+.error-box {
+    background-color: rgba(255, 71, 87, 0.1);
+    color: var(--error-red);
+    border: 2px solid var(--error-red);
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.error-box h3 {
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+a {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 24px;
+    background: var(--primary-purple);
+    color: var(--text-white);
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px var(--shadow-strong);
+}
+
+a:hover {
+    background: var(--primary-purple-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow-strong);
+}

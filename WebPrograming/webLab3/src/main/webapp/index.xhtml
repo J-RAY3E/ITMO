@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="https://jakarta.ee/xml/ns/jakartaee"
+    xmlns:f="https://jakarta.ee/xml/ns/jakartaee" xmlns:ace="http://www.icefaces.org/icefaces/components">
+<h:head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Point Checker - Start Page</title>
+    <h:outputStylesheet library="css" name="style.css" />
+    <h:outputScript library="js" name="clock.js" />
+</h:head>
+<h:body>
+    <div class="container">
+        <!-- Header with student information -->
+        <header class="header">
+            <h1>Лабораторная работа №3</h1>
+            <div class="student-info">
+                <p><strong>ФИО:</strong> Иванов Иван Иванович</p>
+                <p><strong>Группа:</strong> P3210</p>
+                <p><strong>Вариант:</strong> 123456</p>
+            </div>
+        </header>
+
+        <!-- Interactive clock -->
+        <div class="clock-container">
+            <div class="clock">
+                <h2>Текущие дата и время</h2>
+                <div id="current-time" class="time-display">
+                    <span id="date"></span>
+                    <span id="time"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation to main page -->
+        <div class="navigation">
+            <h:form>
+                <h:commandButton value="Перейти к приложению" action="toMain" styleClass="btn btn-primary" />
+            </h:form>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Web Programming, 2024</p>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize clock
+        updateClock();
+        setInterval(updateClock, 10000); // Update every 10 seconds
+    </script>
+</h:body>
+
+</html>
