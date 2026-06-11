@@ -1,0 +1,220 @@
+plugins {
+	id "java"
+	id "io.gatling.gradle" version "3.13.0"
+}
+
+
+repositories{
+	mavenCentral()
+}
+
+ext{
+	reportsDir = file("$buildDir/reports/gatling")
+}
+
+dependencies {
+
+	compileOnly 'javax:javaee-api:8.0'
+    implementation 'javax.persistence:javax.persistence-api:2.2'
+
+    testCompileOnly 'javax:javaee-api:8.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
+    
+    testImplementation 'org.hibernate:hibernate-core:5.6.15.Final'
+    testImplementation 'com.h2database:h2:2.2.224'
+    testImplementation 'org.seleniumhq.selenium:selenium-java:4.20.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+
+	gatling 'io.gatling:gatling-app:3.13.0'
+	gatling 'io.gatling.highcharts:gatling-charts-highcharts:3.13.0'
+}
+
+sourceSets {
+	jmh {
+		java { srcDir 'src/jmh/java' }
+		compileClasspath += sourceSets.main.runtimeClasspath + files(project.property('classDir'))
+		runtimeClasspath += sourceSets.main.runtimeClasspath + files(project.property('classDir'))
+	}
+}
+
+dependencies {
+	jmhImplementation 'org.openjdk.jmh:jmh-core:1.37'
+	jmhAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
+}
+
+tasks.register("jmh", JavaExec) {
+	dependsOn 'compileJmhJava', 'classCompile'
+	description = 'Run JMH benchmarks'
+	group = 'benchmark'
+	classpath = sourceSets.jmh.runtimeClasspath + sourceSets.jmh.compileClasspath
+	mainClass = 'org.openjdk.jmh.Main'
+	doFirst {
+		mkdir "$buildDir/reports/jmh"
+	}
+	args '-rf', 'json'
+	args '-rff', "$buildDir/reports/jmh/results.json"
+}
+
+compileJmhJava {
+	dependsOn 'classCompile'
+}
+
+// DOCKER BUILDER LAB4
+
+tasks.register("npmInstall",Exec){
+	workingDir project.property('frontend')
+	commandLine 'npm', 'install'
+}
+
+tasks.register("npmRun",Exec){
+	workingDir project.property('frontend')
+	dependsOn npmInstall
+	commandLine 'npm', 'run','build'
+}
+/*
+tasks.register("classCompile", Exec) {
+
+    def outDir = file(project.property('classDir'))
+
+    def sources = fileTree(project.property('srcDir'))
+            .include('**//*.java')
+            .collect { it.absolutePath }
+
+    doFirst {
+        outDir.mkdirs()
+    }
+
+    commandLine([
+        'javac',
+        '-d', outDir.absolutePath,
+        '-sourcepath', project.property('srcDir'),
+        '-cp', configurations.compileClasspath.asPath
+    ] + sources)
+}
+*/
+tasks.register("classCompile",JavaCompile){
+
+	source = fileTree(project.property('srcDir'))
+	            .include('**/*.java')
+	            
+	destinationDirectory = file(project.property('classDir'))
+	
+	classpath = configurations.compileClasspath
+	options.encoding = 'UTF-8'
+}
+
+
+
+
+tasks.register("warBuild",Exec){
+	dependsOn classCompile
+	dependsOn npmRun
+
+	doFirst{
+
+		def staging = file("${project.property('buildDir')}/staging")
+		
+    	staging.mkdirs()
+		mkdir "${staging}/META-INF"
+		mkdir "${staging}/WEB-INF/classes" 
+		def meta = file("${staging}/META-INF/MANIFEST.MF")
+		meta.text = """Manifest-Version: 1.0
+Implementation-Version: ${project.property('version')}
+"""
+		copy {
+		    from project.property('classDir')
+		    into "${staging}/WEB-INF/classes"
+		}
+		copy {
+		    from 'src/main/resources'
+		    include '**/*'
+		    into "${staging}/WEB-INF/classes"
+		}
+		copy {
+			from 'frontend/dist'
+			from project.property('webAppDir')
+			into staging
+		}
+	}
+
+	workingDir = "${project.property('buildDir')}/staging"
+	
+	commandLine 'jar','cvfm'
+	args "../${project.property('warName')}"
+	args 'META-INF/MANIFEST.MF'
+	args '.'
+
+}
+
+
+
+// LOCAL TASKS
+
+tasks.register("dockerClean",Exec){
+	commandLine 'docker-compose', 'down', '-v' , '--remove-orphans'
+}
+
+tasks.register("myClean",Delete){
+	dependsOn dockerClean
+	delete project.property('buildDir')
+	
+}
+
+tasks.register("dockerUp",Exec){
+		commandLine 'docker-compose', 'up', '-d', 'app-weblab', 'selenium-hub'
+}
+
+tasks.register("dockerTest",Exec){
+		dependsOn dockerUp
+
+		commandLine 'docker-compose', 'run', '--rm',
+		        'test-runner',
+		        'gradle',
+		        '--project-cache-dir',
+		        '/tmp/gradle-project',
+		        'myTest'
+}
+
+tasks.register("localTest"){
+	dependsOn dockerUp
+	//link http://localhost:8081/webLab4/
+	dependsOn myTest
+}
+
+
+tasks.register("report") {
+    def iscommit = project.hasProperty('commit')
+    def reportPath = "${project.property('buildDir')}/reports/tests/xml"
+    
+    doLast {
+        ["git", "add", "${reportPath}/*.xml"].execute(null, project.projectDir).waitFor()
+        
+        if (iscommit) {
+            def msg = project.findProperty('message') ?: "report XML"
+            ["git", "commit", "-m", msg].execute(null, project.projectDir).waitFor()
+        }
+    }
+}
+
+// DOCKER TEST TASKS
+
+tasks.register("myTest",Test){
+    useJUnitPlatform()
+
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+
+	reports{
+		junitXml.required = true
+		html.required = true
+	}
+}
+
+tasks.withType(Test){
+	def baseOutputDir = file(project.property("outputTest"))
+   	//output_report_path =  outputTest/test/xml (target)
+    reports.html.outputLocation = layout.buildDirectory.dir("reports/tests/html")
+    reports.junitXml.outputLocation = layout.buildDirectory.dir("reports/tests/xml")
+
+}

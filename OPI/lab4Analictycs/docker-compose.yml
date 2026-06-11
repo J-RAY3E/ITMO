@@ -1,0 +1,65 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: lab4db
+      POSTGRES_USER: lab4user
+      POSTGRES_PASSWORD: lab4pass
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U lab4user -d lab4db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - lab-network
+
+  app-weblab:
+    image: lab4
+    build: .
+    ports:
+      - "8081:8080"
+      - "9990:9990"
+      - "9999:9999"
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+    volumes:
+      - ./jmx-conf:/opt/jboss/wildfly/standalone/configuration/jmx
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8080/webLab4/|| exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - lab-network
+
+  selenium-hub:
+    image: selenium/standalone-chrome:latest
+    init: true
+    shm_size: 2gb
+    networks:
+      - lab-network
+      
+  gatling:
+    image: gradle:8.7-jdk1
+    user: "${MY_UID:-1000}:${MY_GID:-1000}"
+    build: .
+    volumes:
+      - .:/home/gradle/project
+    working_dir: /home/gradle/project
+    networks:
+      - lab-network
+    depends_on:
+      app-weblab:
+        condition: service_healthy
+
+networks:
+  lab-network:
+    driver: bridge
